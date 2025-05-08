@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo
+
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    restart: "always"
+
+  notification-service:
+    build: ./services/notification-service
+    ports:
+      - "5004:5004"
+    restart: "always"
