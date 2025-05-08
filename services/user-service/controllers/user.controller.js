@@ -43,4 +43,47 @@ const logout = async (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
-module.exports = { register, login, getProfile, logout };
+const recieveMoney = async (req, res) => {
+  const { amount } = req.body;
+
+  try {
+    const updatedUser = await User.updateOne(
+      { id: req.user.id },
+      { $inc: { balance: amount } }
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    console.log("Error in recieve money controller ", error);
+  }
+};
+
+const sendMoney = async (req, res) => {
+  const { amount } = req.body;
+  const user = req.user;
+
+  if (user.balance == 0 || user.balance < amount) {
+    res
+      .status(400)
+      .json({ message: "Balace is not enough for this transaction." });
+  }
+
+  try {
+    const updatedUser = await User.updateOne(
+      { id: user.id },
+      { $inc: { balance: -amount } }
+    );
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.log("Error in send money controller ", error);
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  getProfile,
+  logout,
+  recieveMoney,
+  sendMoney,
+};
