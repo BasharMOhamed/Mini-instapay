@@ -6,4 +6,4 @@ const { transfereMoney } = require("../controllers/transaction.controller");
 
 router.post("/transfere", authenticate, transfereMoney);
 
-export default router;
+module.exports = router;

@@ -1,9 +1,9 @@
 const axios = require("axios");
 
 const Transaction = require("../models/transaction.model.js");
-const USER_URL = "http://localhost:5000/user";
+const USER_URL = "http://user-service:5000/user";
 
-export const transfereMoney = async (req, res) => {
+const transfereMoney = async (req, res) => {
   const user = req.user;
   const { to, amount } = req.body;
   console.log(to, amount);
@@ -28,3 +28,5 @@ export const transfereMoney = async (req, res) => {
     console.log(`Error in creating transaction controller `, error);
   }
 };
+
+module.exports = { transfereMoney };
