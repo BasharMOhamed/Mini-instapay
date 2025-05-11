@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, creditCard) => {
     setIsLoading(true);
     setError(null);
 
@@ -109,6 +109,7 @@ export const AuthProvider = ({ children }) => {
         name,
         email,
         password,
+        creditCard,
       });
 
       if (response.data) {

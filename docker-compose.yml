@@ -13,6 +13,16 @@ services:
       - mini-instapay-network
     restart: "always"
 
+  transaction-service:
+    build: ./services/transaction-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongo
+    networks:
+      - mini-instapay-network
+    restart: "always"
+
   notification-service:
     build: ./services/notification-service
     ports:

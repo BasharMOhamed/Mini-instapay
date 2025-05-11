@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useTransactions } from "../context/TransactionContext";
 
 const SendMoney = () => {
   const [recipient, setRecipient] = useState("");
@@ -6,6 +7,7 @@ const SendMoney = () => {
   const [note, setNote] = useState("");
   const [navbarHeight, setNavbarHeight] = useState(0);
   const [errors, setErrors] = useState({});
+  const { sendMoney } = useTransactions();
 
   useEffect(() => {
     const navbar = document.querySelector("nav");
@@ -37,6 +39,7 @@ const SendMoney = () => {
     if (Object.keys(formErrors).length === 0) {
       console.log("Money transfer initiated", { recipient, amount, note });
       // Here you would typically call an API to process the payment
+      sendMoney(recipient, amount, note);
       alert(`$${amount} sent to ${recipient} successfully!`);
       // Reset form
       setRecipient("");

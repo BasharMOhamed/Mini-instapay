@@ -5,6 +5,8 @@ import { useAuth } from "./AuthContext";
 const API_URL = "http://localhost:5002/transaction";
 const USER_API_URL = "http://localhost:5000/user";
 
+axios.defaults.withCredentials = true;
+
 const TransactionContext = createContext();
 
 export const useTransactions = () => {

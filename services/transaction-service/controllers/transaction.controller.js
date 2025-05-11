@@ -5,21 +5,20 @@ const USER_URL = "http://user-service:5000/user";
 
 const transfereMoney = async (req, res) => {
   const user = req.user;
-  const { to, amount } = req.body;
-  console.log(to, amount);
+  const { to, amount, note } = req.body;
+  console.log(to, amount, note);
 
   try {
-    // todo --> add note to the transaction
     const newTransaction = await Transaction.create({
-      from: user.id,
+      from: user.email,
       to,
       amount,
+      note,
     });
 
     // todo --> send money & recieve money aren't used
     const sendMoney = await axios.post(`${USER_URL}/send-money`, {
       amount,
-      to,
     });
     const recieveMoney = await axios.post(`${USER_URL}/recieve-money`, {
       amount,
@@ -31,4 +30,19 @@ const transfereMoney = async (req, res) => {
   }
 };
 
-module.exports = { transfereMoney };
+const getUserHistory = async (req, res) => {
+  try {
+    console.log("User email for history query:", req.user.email);
+
+    const userHistory = await Transaction.find({
+      $or: [{ from: req.user.email }, { to: req.user.email }],
+    });
+
+    res.json(userHistory);
+  } catch (error) {
+    console.log(`Error in get user history controller:`, error);
+    res.status(500).json({ error: "Failed to retrieve transaction history" });
+  }
+};
+
+module.exports = { transfereMoney, getUserHistory };

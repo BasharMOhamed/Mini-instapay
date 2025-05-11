@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTransactions } from "../context/TransactionContext";
+import { useAuth } from "../context/AuthContext";
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -9,41 +10,12 @@ const formatCurrency = (amount) => {
 const Balance = () => {
   const [navbarHeight, setNavbarHeight] = useState(0);
   // const [balance, setBalance] = useState(1250.75);
-  const { balance } = useTransactions();
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "received",
-      amount: 250.0,
-      from: "john.doe@example.com",
-      date: "2023-11-15",
-      note: "Rent payment",
-    },
-    {
-      id: 2,
-      type: "sent",
-      amount: 45.5,
-      to: "coffee.shop@example.com",
-      date: "2023-11-14",
-      note: "Coffee with friends",
-    },
-    {
-      id: 3,
-      type: "received",
-      amount: 1000.0,
-      from: "employer@company.com",
-      date: "2023-11-10",
-      note: "Salary",
-    },
-    {
-      id: 4,
-      type: "sent",
-      amount: 120.0,
-      to: "utilities@example.com",
-      date: "2023-11-05",
-      note: "Electricity bill",
-    },
-  ]);
+  // const [transactions, setTransactions] = useState();
+  const [moneyIn, setMoneyIn] = useState(0);
+  const [moneyOut, setMoneyOut] = useState(0);
+  const { fetchBalance, fetchTransactions, transactions, balance } =
+    useTransactions();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const navbar = document.querySelector("nav");
@@ -52,7 +24,22 @@ const Balance = () => {
     }
 
     // In a real app, you would fetch the balance and transactions from an API
-    // fetchBalanceAndTransactions();
+    fetchBalance();
+    fetchTransactions();
+    console.log(transactions);
+
+    const inTranasctions = transactions.reduce((acc, trans) => {
+      if (trans.to == currentUser.email) return acc + trans.amount;
+      return acc;
+    }, 0);
+    const outTransactions = transactions.reduce((acc, trans) => {
+      if (trans.from == currentUser.email) return acc + trans.amount;
+      return acc;
+    }, 0);
+    console.log(inTranasctions, outTransactions);
+
+    setMoneyIn(inTranasctions);
+    setMoneyOut(outTransactions);
   }, []);
 
   return (
@@ -79,13 +66,13 @@ const Balance = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <StatComponent
             title="Money In (This Month)"
-            value={1250}
+            value={moneyIn}
             color={"text-green-600"}
             sign={"+"}
           />
           <StatComponent
             title="Money Out (This Month)"
-            value={165.5}
+            value={moneyOut}
             color={"text-red-600"}
             sign={"-"}
           />

@@ -1,93 +1,23 @@
 import React, { useState, useEffect } from "react";
+import { useTransactions } from "../context/TransactionContext";
 
 const History = () => {
   const [navbarHeight, setNavbarHeight] = useState(0);
-  const [transactions, setTransactions] = useState([
-    {
-      id: 1,
-      type: "received",
-      amount: 250.0,
-      from: "john.doe@example.com",
-      to: null,
-      date: "2023-11-15",
-      note: "Rent payment",
-    },
-    {
-      id: 2,
-      type: "sent",
-      amount: 45.5,
-      from: null,
-      to: "coffee.shop@example.com",
-      date: "2023-11-14",
-      note: "Coffee with friends",
-    },
-    {
-      id: 3,
-      type: "received",
-      amount: 1000.0,
-      from: "employer@company.com",
-      to: null,
-      date: "2023-11-10",
-      note: "Salary",
-    },
-    {
-      id: 4,
-      type: "sent",
-      amount: 120.0,
-      from: null,
-      to: "utilities@example.com",
-      date: "2023-11-05",
-      note: "Electricity bill",
-    },
-    {
-      id: 5,
-      type: "sent",
-      amount: 35.99,
-      from: null,
-      to: "streaming@example.com",
-      date: "2023-11-01",
-      note: "Monthly subscription",
-    },
-    {
-      id: 6,
-      type: "received",
-      amount: 75.0,
-      from: "friend@example.com",
-      to: null,
-      date: "2023-10-28",
-      note: "Dinner split",
-    },
-    {
-      id: 7,
-      type: "sent",
-      amount: 89.99,
-      from: null,
-      to: "online.store@example.com",
-      date: "2023-10-25",
-      note: "Headphones",
-    },
-    {
-      id: 8,
-      type: "received",
-      amount: 1000.0,
-      from: "employer@company.com",
-      to: null,
-      date: "2023-10-10",
-      note: "Salary",
-    },
-  ]);
+  const [transactions, setTransactions] = useState([]);
 
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
 
+  const { fetchTransactions } = useTransactions();
+
   useEffect(() => {
     const navbar = document.querySelector("nav");
     if (navbar) {
       setNavbarHeight(navbar.offsetHeight);
     }
-    // fetchTransactions();
+    fetchTransactions();
   }, []);
 
   const formatCurrency = (amount) => {

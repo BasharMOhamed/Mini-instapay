@@ -96,13 +96,24 @@ const recieveMoney = async (req, res) => {
   const { amount } = req.body;
 
   try {
+    // Update the user's balance by their ID
     const updatedUser = await User.updateOne(
-      { id: req.user.id },
+      { to: req.user.email },
       { $inc: { balance: amount } }
     );
-    res.json(updatedUser);
+
+    if (updatedUser.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({ error: "User not found or balance not updated" });
+    }
+
+    // Get the updated user to return the new balance
+    const user = await User.findById(req.user._id).select("-password");
+    res.json(user);
   } catch (error) {
-    console.log("Error in recieve money controller ", error);
+    console.error("Error in receive money controller:", error);
+    res.status(500).json({ error: "Failed to update balance" });
   }
 };
 
@@ -110,21 +121,32 @@ const sendMoney = async (req, res) => {
   const { amount } = req.body;
   const user = req.user;
 
-  if (user.balance == 0 || user.balance < amount) {
-    res
+  // Check if user has sufficient balance
+  if (user.balance === 0 || user.balance < amount) {
+    return res
       .status(400)
-      .json({ message: "Balace is not enough for this transaction." });
+      .json({ message: "Balance is not enough for this transaction." });
   }
 
   try {
+    // Update the user's balance by their ID
     const updatedUser = await User.updateOne(
-      { id: user.id },
+      { from: user.email },
       { $inc: { balance: -amount } }
     );
 
-    res.json(updatedUser);
+    if (updatedUser.modifiedCount === 0) {
+      return res
+        .status(404)
+        .json({ error: "User not found or balance not updated" });
+    }
+
+    // Get the updated user to return the new balance
+    const updatedUserData = await User.findById(user._id).select("-password");
+    res.json(updatedUserData);
   } catch (error) {
-    console.log("Error in send money controller ", error);
+    console.error("Error in send money controller:", error);
+    res.status(500).json({ error: "Failed to update balance" });
   }
 };
 

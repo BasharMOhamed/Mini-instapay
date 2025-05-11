@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Register = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [creditCard, setCreditCard] = useState("");
   const [navbarHeight, setNavbarHeight] = useState(0);
   const [errors, setErrors] = useState({});
+  const { register, isLoading, error: registerError } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const navbar = document.querySelector("nav");
@@ -17,6 +21,11 @@ const Register = () => {
 
   const validateForm = () => {
     let errors = {};
+    if (!name) {
+      errors.name = "Name is required";
+    } else if (name.trim().length < 2) {
+      errors.name = "Name is Invalid";
+    }
     if (!email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -29,17 +38,28 @@ const Register = () => {
     }
     if (!creditCard) {
       errors.creditCard = "Credit card is required";
-    } else if (!/^\d{16}$/.test(creditCard)) {
+    } else if (!/^\d{16}$/.test(creditCard.trim())) {
       errors.creditCard = "Credit card must be 16 digits";
     }
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
     if (Object.keys(formErrors).length === 0) {
-      console.log("Registration submitted", { email, password, creditCard });
+      console.log("Registration submitted", {
+        email,
+        password,
+        creditCard,
+        name,
+      });
+      const success = await register(name, email, password, creditCard);
+      console.log(success);
+
+      if (success) {
+        navigate("/balance");
+      }
     } else {
       setErrors(formErrors);
     }
@@ -55,7 +75,39 @@ const Register = () => {
           <h2 className="mb-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
+
+          {registerError && (
+            <div
+              className="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
+              <span className="block sm:inline">{loginError}</span>
+            </div>
+          )}
+
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                Username
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
+                required
+                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Username"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs italic">{errors.name}</p>
+              )}
+            </div>
             <div>
               <label
                 htmlFor="email-address"
@@ -128,8 +180,35 @@ const Register = () => {
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={isLoading}
               >
-                Register
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Registering...
+                  </span>
+                ) : (
+                  "Register"
+                )}
               </button>
             </div>
           </form>
