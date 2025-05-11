@@ -9,12 +9,14 @@ const transfereMoney = async (req, res) => {
   console.log(to, amount);
 
   try {
+    // todo --> add note to the transaction
     const newTransaction = await Transaction.create({
       from: user.id,
       to,
       amount,
     });
 
+    // todo --> send money & recieve money aren't used
     const sendMoney = await axios.post(`${USER_URL}/send-money`, {
       amount,
       to,

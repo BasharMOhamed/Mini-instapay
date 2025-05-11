@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// todo --> add note to the transaction
 const transactionSchema = new mongoose.Schema({
   from: { required: true, type: mongoose.Types.ObjectId },
   to: { required: true, type: mongoose.Types.ObjectId },

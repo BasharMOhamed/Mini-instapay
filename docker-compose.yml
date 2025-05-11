@@ -9,10 +9,28 @@ services:
       - "5000:5000"
     depends_on:
       - mongo
+    networks:
+      - mini-instapay-network
     restart: "always"
 
   notification-service:
     build: ./services/notification-service
     ports:
       - "5004:5004"
+    networks:
+      - mini-instapay-network
     restart: "always"
+
+  client:
+    build: ./client
+    ports:
+      - "5173:80"
+    depends_on:
+      - user-service
+      - notification-service
+    networks:
+      - mini-instapay-network
+
+networks:
+  mini-instapay-network:
+    driver: bridge
