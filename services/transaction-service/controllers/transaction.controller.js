@@ -16,24 +16,40 @@ const transfereMoney = async (req, res) => {
       note,
     });
 
-    // todo --> send money & recieve money aren't used
-    const sendMoney = await axios.post(`${USER_URL}/send-money`, {
-      amount,
-    });
-    const recieveMoney = await axios.post(`${USER_URL}/recieve-money`, {
-      amount,
-    });
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const sendMoney = await axios.post(
+      `${USER_URL}/send-money`,
+      { amount, to },
+      {
+        headers: {
+          Cookie: `token=${token}`,
+        },
+      }
+    );
+
+    const receiveMoney = await axios.post(
+      `${USER_URL}/recieve-money`,
+      { amount, to },
+      {
+        headers: {
+          Cookie: `token=${token}`,
+        },
+      }
+    );
 
     res.json({ transaction: newTransaction });
   } catch (error) {
-    console.log(`Error in creating transaction controller `, error);
+    console.error("Error in creating transaction:", error.message);
+    res.status(500).json({ error: "Failed to process transaction" });
   }
 };
 
 const getUserHistory = async (req, res) => {
   try {
-    console.log("User email for history query:", req.user.email);
-
     const userHistory = await Transaction.find({
       $or: [{ from: req.user.email }, { to: req.user.email }],
     });

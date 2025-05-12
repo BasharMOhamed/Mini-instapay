@@ -1,6 +1,9 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+
+const NOTIFY_URL = "http://notification-service:5004/notify";
 
 const register = async (req, res) => {
   const { name, email, password, creditCard } = req.body;
@@ -93,24 +96,22 @@ const logout = async (req, res) => {
 };
 
 const recieveMoney = async (req, res) => {
-  const { amount } = req.body;
+  const { amount, to } = req.body;
+  console.log("amount ", amount, " to ", to);
 
   try {
-    // Update the user's balance by their ID
     const updatedUser = await User.updateOne(
-      { to: req.user.email },
+      { email: to },
       { $inc: { balance: amount } }
     );
 
-    if (updatedUser.modifiedCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "User not found or balance not updated" });
-    }
+    const notification = await axios.post(NOTIFY_URL, {
+      email: to,
+      subject: "Money Recieved",
+      message: `You have recieved $${amount} from ${req.user.email}`,
+    });
 
-    // Get the updated user to return the new balance
-    const user = await User.findById(req.user._id).select("-password");
-    res.json(user);
+    res.status(200).json({ message: "Money received successfully" });
   } catch (error) {
     console.error("Error in receive money controller:", error);
     res.status(500).json({ error: "Failed to update balance" });
@@ -118,10 +119,9 @@ const recieveMoney = async (req, res) => {
 };
 
 const sendMoney = async (req, res) => {
-  const { amount } = req.body;
+  const { amount, to } = req.body;
   const user = req.user;
 
-  // Check if user has sufficient balance
   if (user.balance === 0 || user.balance < amount) {
     return res
       .status(400)
@@ -129,21 +129,16 @@ const sendMoney = async (req, res) => {
   }
 
   try {
-    // Update the user's balance by their ID
     const updatedUser = await User.updateOne(
-      { from: user.email },
+      { email: user.email },
       { $inc: { balance: -amount } }
     );
-
-    if (updatedUser.modifiedCount === 0) {
-      return res
-        .status(404)
-        .json({ error: "User not found or balance not updated" });
-    }
-
-    // Get the updated user to return the new balance
-    const updatedUserData = await User.findById(user._id).select("-password");
-    res.json(updatedUserData);
+    const notify = await axios.post(NOTIFY_URL, {
+      email: user.email,
+      subject: "Money Sent",
+      message: `You have sent $${amount} to ${to}`,
+    });
+    res.status(200).json({ message: "Money sent successfully" });
   } catch (error) {
     console.error("Error in send money controller:", error);
     res.status(500).json({ error: "Failed to update balance" });

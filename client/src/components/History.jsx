@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useTransactions } from "../context/TransactionContext";
+import { useAuth } from "../context/AuthContext";
 
 const History = () => {
   const [navbarHeight, setNavbarHeight] = useState(0);
-  const [transactions, setTransactions] = useState([]);
-
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  const { fetchTransactions } = useTransactions();
+  const { fetchTransactions, transactions } = useTransactions();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const navbar = document.querySelector("nav");
@@ -192,19 +192,19 @@ const History = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div
                           className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
-                            transaction.type === "received"
+                            transaction.to === currentUser.email
                               ? "bg-green-100 text-green-600"
                               : "bg-red-100 text-red-600"
                           }`}
                         >
-                          {transaction.type === "received" ? "↓" : "↑"}
+                          {transaction.to === currentUser.email ? "↓" : "↑"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {formatDate(transaction.date)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {transaction.type === "received"
+                        {transaction.to === currentUser.email
                           ? `From: ${transaction.from}`
                           : `To: ${transaction.to}`}
                       </td>
@@ -213,12 +213,12 @@ const History = () => {
                       </td>
                       <td
                         className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${
-                          transaction.type === "received"
+                          transaction.to === currentUser.email
                             ? "text-green-600"
                             : "text-red-600"
                         }`}
                       >
-                        {transaction.type === "received" ? "+" : "-"}
+                        {transaction.to === currentUser.email ? "+" : "-"}
                         {formatCurrency(transaction.amount)}
                       </td>
                     </tr>

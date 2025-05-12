@@ -2,7 +2,6 @@ const axios = require("axios");
 
 const authenticate = async (req, res, next) => {
   const token = req.cookies.token;
-  console.log("Token from cookies:", token);
 
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
@@ -11,10 +10,10 @@ const authenticate = async (req, res, next) => {
   try {
     const response = await axios.get("http://user-service:5000/user/profile", {
       headers: {
-        cookie: `token=${token}`,
+        Cookie: `token=${token}`,
       },
     });
-    console.log("User service response:", response.data);
+
     req.user = response.data;
     next();
   } catch (err) {

@@ -26,7 +26,7 @@ const Balance = () => {
     // In a real app, you would fetch the balance and transactions from an API
     fetchBalance();
     fetchTransactions();
-    console.log(transactions);
+    console.log("transactions ", transactions);
 
     const inTranasctions = transactions.reduce((acc, trans) => {
       if (trans.to == currentUser.email) return acc + trans.amount;
@@ -36,11 +36,11 @@ const Balance = () => {
       if (trans.from == currentUser.email) return acc + trans.amount;
       return acc;
     }, 0);
-    console.log(inTranasctions, outTransactions);
+    console.log("in ", inTranasctions, " out ", outTransactions);
 
     setMoneyIn(inTranasctions);
     setMoneyOut(outTransactions);
-  }, []);
+  }, [transactions, balance]);
 
   return (
     <div
@@ -93,7 +93,10 @@ const Balance = () => {
           </div>
           <ul className="divide-y divide-gray-200">
             {transactions.map((transaction) => (
-              <TransactionComponent transaction={transaction} />
+              <TransactionComponent
+                transaction={transaction}
+                currentUser={currentUser}
+              />
             ))}
           </ul>
           <div className="px-6 py-4 border-t border-gray-200">
@@ -121,23 +124,23 @@ const StatComponent = ({ title, value, color, sign }) => {
   );
 };
 
-const TransactionComponent = ({ transaction }) => {
+const TransactionComponent = ({ transaction, currentUser }) => {
   return (
     <li key={transaction.id} className="px-6 py-4 hover:bg-gray-50">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-              transaction.type === "received"
+              transaction.to === currentUser.email
                 ? "bg-green-100 text-green-600"
                 : "bg-red-100 text-red-600"
             }`}
           >
-            {transaction.type === "received" ? "↓" : "↑"}
+            {transaction.to === currentUser.email ? "↓" : "↑"}
           </div>
           <div>
             <p className="font-medium text-gray-900">
-              {transaction.type === "received"
+              {transaction.to === currentUser.email
                 ? `Received from ${transaction.from}`
                 : `Sent to ${transaction.to}`}
             </p>
@@ -147,10 +150,12 @@ const TransactionComponent = ({ transaction }) => {
         </div>
         <div
           className={`font-bold ${
-            transaction.type === "received" ? "text-green-600" : "text-red-600"
+            transaction.to === currentUser.email
+              ? "text-green-600"
+              : "text-red-600"
           }`}
         >
-          {transaction.type === "received" ? "+" : "-"}
+          {transaction.to === currentUser.email ? "+" : "-"}
           {formatCurrency(transaction.amount)}
         </div>
       </div>
