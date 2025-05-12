@@ -13,7 +13,7 @@ This document outlines the different ways to deploy the Mini InstaPay platform.
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/mini-instapay.git
+   git clone https://github.com/BasharMOhamed/mini-instapay.git
    cd mini-instapay
    ```
 
@@ -41,7 +41,7 @@ You can modify the `docker-compose.yml` file to change ports, environment variab
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/mini-instapay.git
+   git clone https://github.com/BasharMOhamed/mini-instapay.git
    cd mini-instapay
    ```
 
@@ -64,41 +64,6 @@ You can modify the `docker-compose.yml` file to change ports, environment variab
 
 You can modify the Kubernetes YAML files in the `k8s` directory to change resource allocations, environment variables, or other settings.
 
-## Cloud Deployment
-
-### AWS Deployment
-
-1. **Set up an EKS cluster**:
-   ```bash
-   eksctl create cluster --name mini-instapay --region us-east-1 --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4
-   ```
-
-2. **Deploy to EKS**:
-   ```bash
-   kubectl apply -f k8s/
-   ```
-
-3. **Set up a load balancer**:
-   ```bash
-   kubectl apply -f k8s/aws-load-balancer.yaml
-   ```
-
-### Azure Deployment
-
-1. **Create an AKS cluster**:
-   ```bash
-   az aks create --resource-group myResourceGroup --name mini-instapay --node-count 3 --enable-addons monitoring --generate-ssh-keys
-   ```
-
-2. **Get credentials**:
-   ```bash
-   az aks get-credentials --resource-group myResourceGroup --name mini-instapay
-   ```
-
-3. **Deploy to AKS**:
-   ```bash
-   kubectl apply -f k8s/
-   ```
 
 ## Production Considerations
 
