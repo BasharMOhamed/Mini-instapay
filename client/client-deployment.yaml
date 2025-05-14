@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: client-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: client-static-files
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: client-static-files
+          hostPath:
+            path: f:/mini-instapay/client/dist
+            type: Directory
