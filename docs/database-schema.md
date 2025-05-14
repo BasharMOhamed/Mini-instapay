@@ -17,8 +17,6 @@ Stores user information and account balances.
   email: String,
   password: String (hashed),
   balance: Number,
-  createdAt: Date,
-  updatedAt: Date
 }
 ```
 
@@ -33,12 +31,11 @@ Stores all transaction records between users.
 ```javascript
 {
   _id: ObjectId,
-  from: ObjectId (references Users._id),
-  to: ObjectId (references Users._id),
+  from: String,
+  to: String,
   amount: Number,
-  status: String (enum: "pending", "completed", "failed"),
   date: Date,
-  description: String
+  note: String
 }
 ```
 
@@ -47,30 +44,10 @@ Indexes:
 - `to`: Index for faster queries
 - `date`: Index for sorting and filtering
 
-### Notifications Collection
-
-Stores notification records.
-
-```javascript
-{
-  _id: ObjectId,
-  userId: ObjectId (references Users._id),
-  type: String (enum: "transfer", "receive", "system"),
-  message: String,
-  read: Boolean,
-  date: Date
-}
-```
-
-Indexes:
-- `userId`: Index for faster queries
-- `read`: Index for filtering unread notifications
-- `date`: Index for sorting
 
 ## Relationships
 
 - A User can have many Transactions (as sender or receiver)
-- A User can have many Notifications
 - A Transaction is associated with two Users (sender and receiver)
 
 ## Data Flow
