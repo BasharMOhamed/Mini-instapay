@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mini-instapay-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  labels:
+    name: mini-instapay-ingress
+spec:
+  rules:
+    - host: mini-instapay.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: client
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: "/user"
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 5000
+          - pathType: Prefix
+            path: "/transaction"
+            backend:
+              service:
+                name: transaction-service
+                port:
+                  number: 5002
+          - pathType: Prefix
+            path: "/notification"
+            backend:
+              service:
+                name: notification-service
+                port:
+                  number: 5004

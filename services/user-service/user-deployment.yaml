@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user-service
+  labels:
+    app: user
 spec:
   replicas: 1
   selector:
@@ -17,6 +19,7 @@ spec:
           image: sohilametwaly/user-service
           ports:
             - containerPort: 5000
+              name: http
           env:
             - name: PORT
               value: "5000"

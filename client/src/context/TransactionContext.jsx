@@ -2,8 +2,8 @@ import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
-const API_URL = "http://localhost:5002/transaction";
-const USER_API_URL = "http://localhost:5000/user";
+const API_URL = "/transaction";
+const USER_API_URL = "/user";
 
 axios.defaults.withCredentials = true;
 
